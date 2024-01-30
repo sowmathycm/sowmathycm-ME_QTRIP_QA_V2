@@ -22,12 +22,13 @@ import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 import org.testng.asserts.SoftAssert;
 import qtriptest.DP;
+import qtriptest.DriverSingleton;
 
 public class testCase_01 {
 
 
     private static  RemoteWebDriver driver;
-    private SoftAssert softAssert;
+    private static SoftAssert softAssert;
  
     public static void logStatus(String type, String message, String status) {
 		System.out.println(String.format("%s |  %s  |  %s | %s",
@@ -35,17 +36,15 @@ public class testCase_01 {
 	}
 
     @BeforeSuite( alwaysRun = true)
-	public static void createDriver() throws MalformedURLException {
+	public static void Driversetup() throws MalformedURLException {
+		driver = DriverSingleton.getDriver();
+        softAssert = new SoftAssert();
 		logStatus("driver", "Initializing driver", "Started");
-		final DesiredCapabilities capabilities = new DesiredCapabilities();
-		capabilities.setBrowserName(BrowserType.CHROME);
-		driver = new RemoteWebDriver(new URL("http://localhost:8082/wd/hub"), capabilities);
-		logStatus("driver", "Initializing driver", "Success");
 	}
 
 
   
-    @Test(dataProvider = "data-provider",dataProviderClass = DP.class)
+    @Test(dataProvider = "data-provider", dataProviderClass = DP.class, description = "Verify the user login flow", priority = 1, groups ={"Login Flow"})
     public void TestCase01(String username, String password) throws InterruptedException, TimeoutException{
      
      softAssert = new SoftAssert();
@@ -56,7 +55,6 @@ public class testCase_01 {
      softAssert.assertTrue(registerPage.checkRegisterPageNavigation(), "Navigation of Register page is failed");
      registerPage.registernewuser(username, password, password,true);
      Thread.sleep(10000);
-     //homePage.HomePageOptions("login");
      LoginPage loginPage = new LoginPage(driver);
       try{
      loginPage.performNewLoginUser(username, password);
@@ -77,8 +75,9 @@ public class testCase_01 {
     @AfterSuite(enabled = true)
 	
 	public static void quitDriver() throws MalformedURLException {
-		driver.close();
-		driver.quit();
-		logStatus("driver", "Quitting driver", "Success");
+		DriverSingleton.quitDriver();
+        logStatus("driver", "Quitting driver", "Success");
 	}
 }
+
+

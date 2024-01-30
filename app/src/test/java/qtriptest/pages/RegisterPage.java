@@ -53,7 +53,7 @@ public class RegisterPage {
         WebDriverWait wait = new WebDriverWait(driver, 30);
         wait.until(ExpectedConditions.urlContains(url));
         return  driver!=null && driver.getCurrentUrl().contains(REGISTER_PAGE_IDENTIFIER) && registerform!=null &&
-         registerform.isDisplayed();
+        registerform.isDisplayed();
     }
 
 

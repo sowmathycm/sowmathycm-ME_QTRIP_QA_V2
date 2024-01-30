@@ -2,7 +2,45 @@
 <!DOCTYPE suite SYSTEM "https://testng.org/testng-1.0.dtd">
 <suite name="Tests for QTrip User Flow">
     <test name = "Test Execution using testNG" verbose="2">
-        <packages>
+        <groups>
+            <run>
+              <include name = "Login Flow"></include>
+            </run>
+        </groups>
+         <packages>
+            <package name="qtriptest.pages"></package>
+        </packages>
+    </test> <!-- Test -->
+    
+    <test name = "Test Execution using testNG" verbose="2">
+        <groups>
+            <run>
+              <include name = "Search and Filter flow"></include>
+            </run>
+        </groups>
+         <packages>
+            <package name="qtriptest.pages"></package>
+        </packages>
+    </test> <!-- Test -->
+
+    <test name = "Test Execution using testNG" verbose="2">
+        <groups>
+            <run>
+              <include name = "Booking and Cancellation Flow"></include>
+            </run>
+        </groups>
+         <packages>
+            <package name="qtriptest.pages"></package>
+        </packages>
+    </test> <!-- Test -->
+
+    <test name = "Test Execution using testNG" verbose="2">
+        <groups>
+            <run>
+              <include name = "Reliability Flow"></include>
+            </run>
+        </groups>
+         <packages>
             <package name="qtriptest.pages"></package>
         </packages>
     </test> <!-- Test -->
