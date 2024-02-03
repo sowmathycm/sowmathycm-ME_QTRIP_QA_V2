@@ -1,5 +1,6 @@
 package qtriptest.pages;
 
+import qtriptest.SeleniumWrapper;
 import org.openqa.selenium.UnhandledAlertException;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.remote.RemoteWebDriver;
@@ -12,6 +13,7 @@ import org.openqa.selenium.support.ui.WebDriverWait;
 public class LoginPage {
 
     private  RemoteWebDriver driver;
+    private SeleniumWrapper seleniumWrapper;
     private String url = "https://qtripdynamic-qa-frontend.vercel.app/pages/login/";
     private final static String LOGIN_PAGE_IDENTIFIER = "/pages/login/";
 
@@ -33,6 +35,7 @@ public class LoginPage {
     
     public LoginPage(RemoteWebDriver driver){
         this.driver = driver;
+        this.seleniumWrapper = new SeleniumWrapper();
         AjaxElementLocatorFactory ajax = new AjaxElementLocatorFactory(driver, 10);
         PageFactory.initElements(ajax, this);
         driver.manage().window().maximize();
@@ -61,12 +64,9 @@ public class LoginPage {
 
    public  void performExistingUserLogin(String username, String password)throws InterruptedException{
      
-    WebDriverWait wait = new WebDriverWait(driver, 30);
-    WebElement Email = wait.until(ExpectedConditions.visibilityOf(emailtextbox));
-    Email.clear();
-    Email.sendKeys(username);
-    passwordtextbox.sendKeys(password);
-    loginButton.click();
+    seleniumWrapper.sendKeys(emailtextbox, username);
+    seleniumWrapper.sendKeys(passwordtextbox, password);
+    seleniumWrapper.click(loginButton, driver);
 
    }
 

@@ -1,5 +1,6 @@
 package qtriptest.pages;
 
+import qtriptest.SeleniumWrapper;
 import java.rmi.Remote;
 import java.util.NoSuchElementException;
 import java.util.concurrent.TimeoutException;
@@ -20,6 +21,7 @@ import org.openqa.selenium.support.ui.WebDriverWait;
 public class HomePage {
 
     private  RemoteWebDriver driver;
+    private SeleniumWrapper seleniumWrapper;
     private String url = "https://qtripdynamic-qa-frontend.vercel.app/";
 
 
@@ -47,6 +49,7 @@ public class HomePage {
 
     public HomePage(RemoteWebDriver driver){
         this.driver = driver;
+        this.seleniumWrapper = new SeleniumWrapper();
         AjaxElementLocatorFactory ajax = new AjaxElementLocatorFactory(driver, 10);
         PageFactory.initElements(ajax, this);
         driver.manage().window().maximize();
@@ -54,30 +57,23 @@ public class HomePage {
     }
 
     public boolean checkNavigation() {
-        if (!driver.getCurrentUrl().equals(url)) {
-            driver.get(url);
-            return true;
-        }
-        return false;
-          
+        return seleniumWrapper.navigate(driver,url);
     }
 
   
    
     public  void HomePageOptions(String option)throws InterruptedException{
-        WebDriverWait wait = new WebDriverWait(driver, 30);
-        
-        if(option.equalsIgnoreCase("register") && registerButton!=null){
-        wait.until(ExpectedConditions.elementToBeClickable(registerButton)).click();
+       if(option.equalsIgnoreCase("register") && registerButton!=null){
+        seleniumWrapper.click(registerButton, driver);
         }
         else if(option.equalsIgnoreCase("login") && loginButton!=null){
-        wait.until(ExpectedConditions.elementToBeClickable(loginButton)).click();
+        seleniumWrapper.click(loginButton,driver);
         }
         else if(option.equalsIgnoreCase("logout") && logoutButton!=null){
-        wait.until(ExpectedConditions.elementToBeClickable(logoutButton)).click();
+        seleniumWrapper.click(logoutButton,driver);
         }
         else if(homepageButton!=null){
-        wait.until(ExpectedConditions.elementToBeClickable(homepageButton)).click();
+        seleniumWrapper.click(homepageButton,driver);
 
         }
     
@@ -91,7 +87,7 @@ public class HomePage {
     
      
 
-     public boolean searchCity(String CityName){
+     public WebElement searchCity(String CityName){
 
       try{
         enterCity(CityName);
@@ -99,7 +95,7 @@ public class HomePage {
 
       }catch(Exception e){
         System.out.println("Error during city search" +e.getMessage());
-        return false;
+        return null;
       }
      }
 
@@ -108,45 +104,42 @@ public class HomePage {
 
           Thread.sleep(2000);
            try{
-            WebDriverWait wait = new WebDriverWait(driver, 30);
-            WebElement autoComplete = wait.until(ExpectedConditions.elementToBeClickable(By.xpath((String.format("//ul[@id='results']//a[@id='%s']//li", CityName.toLowerCase())))));
+         
+            WebElement autoComplete = SeleniumWrapper.findElementWithRetry(driver, By.xpath(String.format("//ul[@id='results']//a[@id='%s']//li", CityName.toLowerCase())), 30);
            
-            autoComplete.click();
+            seleniumWrapper.click(autoComplete,driver);
             // System.out.println("City selected from autocomplete" +CityName);
             return true;
             
-    }catch(Exception e){
+       }catch(Exception e){
         System.out.println("Error selecting city from autocomplete" + e.getMessage());
         return false;
-    }
+       }
 
  }
      public void enterCity(String CityName) throws InterruptedException{
-        searchbox.clear();
-        searchbox.sendKeys(CityName);
+        seleniumWrapper.sendKeys(searchbox, CityName);
         Thread.sleep(3000);
         
      }
 
-     public boolean isNoRecordsDisplayed() throws TimeoutException {
+     public WebElement isNoRecordsDisplayed() throws TimeoutException {
         
-       return !driver.findElements(By.xpath("//ul[@id='results']//h5[text()='No City found']")).isEmpty();
+       return seleniumWrapper.findElementWithRetry(driver, By.xpath("//ul[@id='results']//h5[text()='No City found']"), 30);
 
         
  } 
 
-    public boolean isAutoCompleteDisplayed(String CityName) throws TimeoutException, InterruptedException{
+    public WebElement isAutoCompleteDisplayed(String CityName) throws TimeoutException, InterruptedException{
         try{
-            return !driver.findElements(By.xpath(String.format("//ul[@id='results']//a[@id='%s']//li", CityName.toLowerCase()))).isEmpty();
-
+            return SeleniumWrapper.findElementWithRetry(driver, By.xpath(String.format("//ul[@id='results']//a[@id='%s']//li", CityName.toLowerCase())), 30);
         }catch(Exception e){
-
-            System.out.println("Error checing autocomplete display" +e.getMessage());
-            return false;
- 
-        } 
-    }
+            System.out.println("Error checking the autocomplete display:" +e.getMessage());
+            return null;
+        }
+ } 
 }
+
      
 
 

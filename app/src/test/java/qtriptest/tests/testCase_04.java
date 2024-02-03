@@ -2,8 +2,18 @@ package qtriptest.tests;
 
 import qtriptest.DP;
 import qtriptest.DriverSingleton;
+import qtriptest.ReportSingleton;
+import java.io.File;
+import java.io.IOException;
 import java.net.MalformedURLException;
 import java.util.concurrent.TimeoutException;
+import com.relevantcodes.extentreports.ExtentReports;
+import com.relevantcodes.extentreports.ExtentTest;
+import com.relevantcodes.extentreports.LogStatus;
+import org.apache.commons.io.FileUtils;
+import org.openqa.selenium.OutputType;
+import org.openqa.selenium.TakesScreenshot;
+import org.openqa.selenium.WebElement;
 import org.openqa.selenium.remote.RemoteWebDriver;
 import org.openqa.selenium.support.ui.WebDriverWait;
 import org.openqa.selenium.support.ui.ExpectedConditions;
@@ -21,6 +31,8 @@ import qtriptest.pages.HistoryPage;
 
 public class testCase_04 {
     private static RemoteWebDriver driver;
+    private static ExtentReports extentReports;
+    private static ExtentTest extentTest;
     private static SoftAssert softAssert;
 
     public static void logStatus(String type, String message, String status) {
@@ -32,12 +44,15 @@ public class testCase_04 {
    @BeforeSuite(alwaysRun = true)
    public static void Driversetup() throws MalformedURLException {
     driver = DriverSingleton.getDriver();
+    extentReports = ReportSingleton.getInstance();
     softAssert = new SoftAssert();
     logStatus("driver", "Initializing driver", "Started");
   }
 
    @Test(dataProvider = "data-provider", dataProviderClass = DP.class, description = "Verify the reliability flow", priority = 4, groups={"Reliability Flow"})
-   public void TestCase04(String username, String password, String dataset1, String dataset2, String dataset3) throws InterruptedException, TimeoutException {
+   public void TestCase04(String username, String password, String dataset1, String dataset2, String dataset3) throws InterruptedException, TimeoutException, IOException {
+    
+    extentTest = extentReports.startTest("Reliability Flow Test");
     softAssert = new SoftAssert();
     HomePage homePage = new HomePage(driver);
     softAssert.assertTrue(homePage.checkNavigation(), "Navigation of Home page is failed");
@@ -61,9 +76,11 @@ public class testCase_04 {
     String Date = DS[3];
     String count = DS[4];
 
-    softAssert.assertTrue(homePage.searchCity(CityName), "City search failed");
-    if (!homePage.isAutoCompleteDisplayed(CityName)) {
-      softAssert.fail("Autocomplete not displayed for city:" + CityName);
+    
+    WebElement autoCompleteElement = homePage.searchCity(CityName);
+    softAssert.assertNotNull(autoCompleteElement, "City search failed");
+    if (autoCompleteElement!=null) {
+        softAssert.assertTrue(autoCompleteElement.isDisplayed(),"Autocomplete not displayed for city:" + CityName);
     }
 
     String CityNamelower = CityName.toLowerCase();
@@ -110,9 +127,11 @@ public class testCase_04 {
     String Date1 = DS1[3];
     String count1 = DS1[4];
     Thread.sleep(2000);
-    softAssert.assertTrue(homePage.searchCity(CityName1), "City search failed");
-    if (!homePage.isAutoCompleteDisplayed(CityName1)) {
-      softAssert.fail("Autocomplete not displayed for city:" + CityName1);
+    
+    WebElement autoCompleteElement1 = homePage.searchCity(CityName1);
+    softAssert.assertNotNull(autoCompleteElement1, "City search failed");
+    if (autoCompleteElement1!=null) {
+        softAssert.assertTrue(autoCompleteElement1.isDisplayed(),"Autocomplete not displayed for city:" + CityName1);
     }
 
     String CityNamelower1= CityName1.toLowerCase();
@@ -156,9 +175,11 @@ public class testCase_04 {
      String Date2 = DS2[3];
      String count2 = DS2[4];
      Thread.sleep(2000);
-     softAssert.assertTrue(homePage.searchCity(CityName2), "City search failed");
-     if (!homePage.isAutoCompleteDisplayed(CityName2)) {
-       softAssert.fail("Autocomplete not displayed for city:" + CityName2);
+    
+     WebElement autoCompleteElement2 = homePage.searchCity(CityName2);
+     softAssert.assertNotNull(autoCompleteElement2, "City search failed");
+     if (autoCompleteElement2!=null) {
+         softAssert.assertTrue(autoCompleteElement2.isDisplayed(),"Autocomplete not displayed for city:" + CityName2);
      }
  
      String CityNamelower2= CityName2.toLowerCase();
@@ -188,6 +209,7 @@ public class testCase_04 {
         softAssert.assertTrue(adventureDetailsPage.verifybooking(), "Success message not displayed");
       }else{
        System.out.println("User already reserved for the adventure");
+       extentTest.log(LogStatus.FAIL, extentTest.addScreenCapture(capture(driver)) + "Success message not displayed");
       }
  
       
@@ -200,15 +222,30 @@ public class testCase_04 {
     homePage.HomePageOptions("logout");
     wait.until(ExpectedConditions.urlToBe("https://qtripdynamic-qa-frontend.vercel.app/pages/adventures/reservations/"));
     softAssert.assertTrue(homePage.checkNavigation(), "User is unable to logged out");
-    
+    extentTest.log(LogStatus.PASS, "Reliability Test Passed");
     
 
   }
+
+  public static String capture(RemoteWebDriver driver) throws IOException{
+    //TODO: Add all the components here
+  
+  
+     File scrFile = ((TakesScreenshot) driver).getScreenshotAs(OutputType.FILE);
+  
+     File Dest = new File(System.getProperty("user.dir")+"/QKARTImages/" + System.currentTimeMillis()+ ".png");
+  
+      String errflpath = Dest.getAbsolutePath();
+      FileUtils.copyFile(scrFile, Dest);
+      return errflpath;
+    }
 
   @AfterSuite(enabled = true)
 	
 	public static void quitDriver() throws MalformedURLException {
 		DriverSingleton.quitDriver();
+        ReportSingleton.endTest(extentTest);
+        ReportSingleton.flush();
         logStatus("driver", "Quitting driver", "Success");
 	}  
 

@@ -1,5 +1,6 @@
 package qtriptest.pages;
 
+import qtriptest.SeleniumWrapper;
 import java.util.List;
 import org.openqa.selenium.By;
 import org.openqa.selenium.TimeoutException;
@@ -13,6 +14,7 @@ import org.openqa.selenium.support.ui.WebDriverWait;
 
 public class AdventureDetailsPage {
   private RemoteWebDriver driver;
+  private SeleniumWrapper seleniumWrapper;
   private String url;
 
   @FindBy(xpath = "//input[@class='form-control' and @name='name']")
@@ -35,6 +37,7 @@ public class AdventureDetailsPage {
 
   public AdventureDetailsPage(RemoteWebDriver driver) {
     this.driver = driver;
+    this.seleniumWrapper = new SeleniumWrapper();
     // AjaxElementLocatorFactory ajax = new AjaxElementLocatorFactory(driver, 10);
     PageFactory.initElements(driver, this);
     driver.manage().window().maximize();
@@ -50,23 +53,12 @@ public class AdventureDetailsPage {
   public boolean reservation(String GuestName, String Date, String count){
 
     System.out.println("Reserving the adventure");
-    WebDriverWait wait = new WebDriverWait(driver, 10);
-    try{
-      wait.until(ExpectedConditions.visibilityOf(name));
-      name.sendKeys(GuestName);
-      wait.until(ExpectedConditions.visibilityOf(date));
-      date.sendKeys(Date);
-      Count.clear();
-      wait.until(ExpectedConditions.visibilityOf(Count));
-      Count.sendKeys(count);
-      wait.until(ExpectedConditions.elementToBeClickable(reserve)).click();
-      return true;
+    seleniumWrapper.sendKeys(name, GuestName);
+    seleniumWrapper.sendKeys(date, Date);
+    seleniumWrapper.sendKeys(Count, count);
+    seleniumWrapper.click(reserve, driver);
+    return true;
 
-
-    }catch(TimeoutException e){
-      System.out.println("Reservation failed");
-      return false;
-    }
     
    }
 
@@ -90,10 +82,9 @@ public class AdventureDetailsPage {
 
   public boolean historyClick() {
 
-    WebDriverWait wait = new WebDriverWait(driver, 10);
-    WebElement historypage = wait.until(ExpectedConditions.visibilityOf(history));
-    historypage.click();
-    return false;
+    System.out.println("Clicking on history link");
+    seleniumWrapper.click(history,driver);
+    return true;
  }
 
    

@@ -1,6 +1,7 @@
 
 package qtriptest.pages;
 
+import qtriptest.SeleniumWrapper;
 import java.util.List;
 import java.util.NoSuchElementException;
 import org.openqa.selenium.By;
@@ -13,6 +14,7 @@ import org.openqa.selenium.support.ui.WebDriverWait;
 
 public class HistoryPage {
     private  RemoteWebDriver driver;
+    private SeleniumWrapper seleniumWrapper;
     private String url;
 
     @FindBy(xpath = "//tbody[@id='reservation-table']/tr/th[@scope='row']")
@@ -26,14 +28,16 @@ public class HistoryPage {
 
     public HistoryPage(RemoteWebDriver driver){
         this.driver = driver;
+        this.seleniumWrapper = new SeleniumWrapper();
         PageFactory.initElements(driver, this);
         driver.manage().window().maximize();
 }
 
     public void setURL(){
-    WebDriverWait wait = new WebDriverWait(driver, 10);
-    wait.until(ExpectedConditions.urlContains("/pages/adventures/reservations/"));
-    url = driver.getCurrentUrl();
+   
+        WebDriverWait wait = new WebDriverWait(driver, 10);
+        wait.until(ExpectedConditions.urlContains("/pages/adventures/reservations/"));
+        url = driver.getCurrentUrl();
 
    }
 
@@ -45,7 +49,7 @@ public class HistoryPage {
 
     WebDriverWait wait = new WebDriverWait(driver, 10);
     WebElement cancelbutton = wait.until(ExpectedConditions.visibilityOf(cancel));
-    cancelbutton.click();
+    seleniumWrapper.click(cancelbutton,driver);
     return false;
    }
 

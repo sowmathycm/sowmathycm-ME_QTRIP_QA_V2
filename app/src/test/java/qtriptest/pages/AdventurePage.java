@@ -1,5 +1,6 @@
 package qtriptest.pages;
 
+import qtriptest.SeleniumWrapper;
 import java.rmi.Remote;
 import java.util.ArrayList;
 import java.util.List;
@@ -21,6 +22,7 @@ public class AdventurePage {
 
   
     private  RemoteWebDriver driver;
+    private SeleniumWrapper seleniumWrapper;
     private String url;
 
     // @FindBy(xpath = "//select[@id='duration-select']/option[text()=' + DurationFilter + ']")
@@ -44,6 +46,7 @@ public class AdventurePage {
 
     public AdventurePage(RemoteWebDriver driver, String CityName){
         this.driver = driver;
+        this.seleniumWrapper = new SeleniumWrapper();
         this.url = "https://qtripdynamic-qa-frontend.vercel.app/pages/adventures/?city=" + CityName;
         //AjaxElementLocatorFactory ajax = new AjaxElementLocatorFactory(driver, 10);
         PageFactory.initElements(driver, this);
@@ -54,9 +57,7 @@ public class AdventurePage {
 
     public boolean checkAdventurePageNavigation() {
        
-        WebDriverWait wait = new WebDriverWait(driver, 10);
-        return wait.until(ExpectedConditions.urlContains(url));
-        
+        return seleniumWrapper.navigate(driver, url);
 
     }
 
@@ -85,30 +86,27 @@ public class AdventurePage {
 
      public boolean adventureSearch(String AdventureName){
 
-        System.out.println("Searching an adventure" + AdventureName);
-        WebDriverWait wait = new WebDriverWait(driver, 10);
-        wait.until(ExpectedConditions.visibilityOf(adventureSearch));
-        adventureSearch.sendKeys(AdventureName);
-        return false;
+        System.out.println("Searching an adventure" +AdventureName);
+        seleniumWrapper.sendKeys(adventureSearch, AdventureName);
+        return true;
      }
 
      public boolean adventureClick(String AdventureName){
         System.out.println("Clicking on adventure" + AdventureName);
-        WebDriverWait wait = new WebDriverWait(driver, 10);
-        wait.until(ExpectedConditions.elementToBeClickable(adventureClick));
-        adventureClick.click();
-        return false;
+        return seleniumWrapper.click(adventureClick, driver);
      }
 
     public void ClearFilters() throws TimeoutException{
+        
         if(isElementDisplayed(durationClear)){
-            durationClear.click();
+         seleniumWrapper.click(durationClear,driver);
         }
           
         if(isElementDisplayed(categoryClear)){
-            categoryClear.click();
+            seleniumWrapper.click(categoryClear,driver);
         }
-
+        
+        
 
     }
 
